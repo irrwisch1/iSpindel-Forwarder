@@ -1,0 +1,51 @@
+{
+	"port": 9502,
+
+	"devices": {
+		"iSpindel000": {
+			"type": "iSpindel",
+			"forwarders": [
+				{
+					"type": "craftbeerpi3",
+					"ip": "192.168.0.52",
+					"send-angle": false
+				},
+				{
+					"type": "ubidots",
+					"token": "xxxx"
+				},
+				{
+					"type": "generic-tcp",
+					"ip": "192.168.0.52",
+					"port": 9501
+				},
+				{
+					"type": "thingspeak",
+					"token": "abcdef",
+					"field-gravity": 0,
+					"field-temperature": 1,
+					"field-tilt": 2,
+					"field-battery": null,
+					"field-rssi": null
+				}
+			]
+		},
+		"eManometer000": {
+			"type": "eManometer",
+			"forwarders": [
+				{
+					"type": "generic-tcp",
+					"ip": "192.168.0.52",
+					"port": 9501
+				},
+				{
+					"type": "thingspeak",
+					"token": "abcdef",
+					"field-temperature": 0,
+					"field-co2": 1,
+					"field-pressure": 2
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "iSpindel000",
+	"ID": 1235,
+	"angle": 30,
+	"temperature": 20,
+	"battery": 4,
+	"gravity": 5,
+	"interval": 120,
+	"RSSI": -60
+}

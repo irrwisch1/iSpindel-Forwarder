@@ -1,0 +1,8 @@
+{
+	"name": "eManometer000",
+	"type": "eManometer",
+	"ID": 4568,
+	"carbondioxid": 30,
+	"temperature": 20,
+	"pressure": 4
+}
