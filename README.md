@@ -30,3 +30,84 @@ to transmit the data (presumely to save battery power).
 This script can act as a relay for the iSpindel. Running for example on an Raspi in 
 the same local network as your iSpindel this script will buffer the data from the iSpindel
 and send it out once the internet connection is back again.
+
+# Configuration
+
+Here is an example configuration
+
+	{
+		/* The port number the script will listen to */
+		"port": 9502,
+
+		/* Array of devices. Just add an entry for each device */
+		"devices": {
+			/* The name of the object must match the name that is transmitted 
+				by the iSpindel / eManometer
+				type can be "iSpindel" or "eManometer" */
+			"iSpindel000": {
+				"type": "iSpindel",
+				/* An array of forwarders for this device. Multiple forwarders of the
+					same type can be defined and each forwarder will be buffered
+					individually
+				*/
+				"forwarders": [
+					{
+						/* Forward to CraftbeerPi3. You need the iSpindel module for craftbeer installed */
+						"type": "craftbeerpi3",
+						"ip": "192.168.0.52",
+
+						/* Send the angle instead of the tilt. If you want to configure the polynom from
+						within Cbpi3 than set this to true. Most people will want this to be false */
+						"send-angle": false
+					},
+					{
+						/* Forward to ubidots */
+						"type": "ubidots",
+						/* API key */
+						"token": "xxxx"
+					},
+					{
+						/* generic-tcp is to forward to the local iSpindel-TCP Server or another instance of
+						this script
+						*/
+						"type": "generic-tcp",
+						"ip": "192.168.0.52",
+						"port": 9501
+					},
+					{
+						/* Forward to thingspeak */
+						"type": "thingspeak",
+
+						/* API key for the channel */
+						"token": "abcdef",
+
+						/* You need to define fields for the specific items. If an item is missing or set the
+						null than it won't be transmitted to thingspeak */
+						"field-gravity": 0,
+						"field-temperature": 1,
+						"field-angle": 2,
+						"field-battery": null,
+						"field-rssi": null,
+						"field-"
+					}
+				]
+			},
+			"eManometer000": {
+				"type": "eManometer",
+				"forwarders": [
+					{
+						"type": "generic-tcp",
+						"ip": "192.168.0.52",
+						"port": 9501
+					},
+					{
+						"type": "thingspeak",
+						"token": "abcdef",
+						"field-temperature": 0,
+						"field-co2": 1,
+						"field-pressure": 2
+					}
+				]
+			}
+		}
+	}

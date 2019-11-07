@@ -1,10 +1,17 @@
 #!/usr/bin/node
 
 const net = require("net");
-const request = require('request')
+const request = require('request');
+const querystring = require('querystring');
 
-var config = require("./example-config.json");
+var config = require("./config.json");
 
+/* Possible return values from a forwarder
+   Success: Data has been successfully transmitted
+   Error: Either configuration error or a non-recoverable error during transmission. Data will be discarded
+   Buffer: Error during transmission that can potentially be recovered (i.e. timeout, server cannot be reached)
+		   Data will be buffered and tried to be sent again periodically
+*/
 const forwardReturnVal = {
 	Success: 1,
 	Error: 2,
@@ -175,7 +182,7 @@ function forwardUbidots(forwarder) {
 		}
 		log(forwarder.type, "returned: " + res.statusCode, res.statusCode == 200);
 		console.log(body);
-		forwardCallback(rec, forwarder, forwardReturnVal.Success);
+		forwardCallback(rec, forwarder, res.statusCode == 200 ? forwardReturnVal.Success : forwardReturnVal.Error);
 	});
 
 }
@@ -238,7 +245,52 @@ function forwardGenericTCP(forwarder) {
 }
 
 function forwardThingspeak(forwarder) {
+	var rec = forwarder.buffer[0];
 	var data = forwarder.buffer[0].data;
+
+	if (forwarder.token == undefined || forwarder.token == null) {
+		log(forwarder.type, color.red + "Config error: missing token");
+		forwardCallback(rec, forwarder, forwardReturnVal.Error);
+		return;
+	}
+
+	var url = "http://api.thingspeak.com/update";
+
+	var outdata = {};
+
+	/* Helper function to add a field if it exists in the data and if it's defined in the config */
+	var addField = function(fieldname) {
+		var num = forwarder['field-' + fieldname];
+
+		if (data[fieldname] && num && num > 0 && num <= 8) {
+			outdata["field" + num] = data[fieldname];
+		}
+	};
+
+	addField('gravity');
+	addField('temperature');
+	addField('angle');
+	addField('battery');
+	addField('rssi');
+	addField('interval');
+	addField('pressure');
+	addField('co2');
+
+	outdata['api_key'] = forwarder.token;
+	outdata['created_at'] = new Date(data.timestamp).toISOString();
+
+	var str = querystring.stringify(outdata);
+
+	request.get(url + "?" + str, function(error, res, body) {
+		if (error) {
+			console.error(error)
+			forwardCallback(rec, forwarder, forwardReturnVal.Buffer);
+			return
+		}
+		log(forwarder.type, "returned: " + res.statusCode, res.statusCode == 200);
+		console.log(body);
+		forwardCallback(rec, forwarder, res.statusCode == 200 ? forwardReturnVal.Success : forwardReturnVal.Error);
+	});
 }
 
 function forwardCallback(data, forwarder, retval)
@@ -281,7 +333,7 @@ function forwardData(forwarder) {
 		case "craftbeerpi3":
 			forwardCraftbeerpi3(forwarder);
 			break;
-		
+
 		case "ubidots":
 			forwardUbidots(forwarder);
 			break;
