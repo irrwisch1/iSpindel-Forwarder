@@ -59,19 +59,26 @@ function logs(sys, msg, status) {
 const server = net.createServer(function(socket) {
 	log("Main", "new connection from " + socket.address().address + ":" + socket.address().port);
 
+	var json = "";
+
 	socket.on("data", function(data) {
+		var s = data.toString();
+		json += s;
+	});
+
+	socket.on('error', function() {
+		console.log("error");
+	});
+
+	socket.on('close', function() {
 		try {
-			var obj = JSON.parse(data);
+			var obj = JSON.parse(json.toString());
 			handleData(obj);
 		}
 		catch (err) {
 			log("Main", color.red + "invalid JSON data received: " + err);
 		}
 
-		socket.end();
-	});
-
-	socket.on('close', function(data) {
 		console.log("connection closed");
 	});
 
