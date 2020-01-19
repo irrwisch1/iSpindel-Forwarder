@@ -122,10 +122,11 @@ function forwardCraftbeerpi3(forwarder) {
 			return
 		}
 
-		logs(forwarder.type, "returned: " + res.statusCode, res.statusCode == 200);
+		var success = res.statusCode == 200 || res.statusCode == 204;
+		logs(forwarder.type, "returned: " + res.statusCode, success);
 		console.log(body);
 
-		if (res.statusCode == 200)
+		if (success)
 			forwardCallback(rec, forwarder, forwardReturnVal.Success);
 		else
 			forwardCallback(rec, forwarder, forwardReturnVal.Error);
