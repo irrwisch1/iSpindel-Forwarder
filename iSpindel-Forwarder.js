@@ -39,7 +39,8 @@ const color = {
 };
 
 function log(sys, msg) {
-	console.log(color.reset + "[" + color.yellow + sys + color.reset + "]", msg, color.reset);
+	var d = new Date();
+	console.log(color.reset + "[" + color.yellow + sys + color.reset + "]", d.toLocaleString(), msg, color.reset);
 }
 
 function logs(sys, msg, status) {
@@ -52,7 +53,8 @@ function logs(sys, msg, status) {
 		statusStr = color.green + "OK" + color.reset;
 	}
 
-	console.log(color.reset + "[" + color.yellow + sys + color.reset + "]", msg, "[" + statusStr + "]");
+	var d = new Date();
+	console.log(color.reset + "[" + color.yellow + sys + color.reset + "]", d.toLocaleString(), msg, "[" + statusStr + "]");
 }
 
 
